@@ -2584,6 +2584,9 @@ class WebSocketServerProtocol(WebSocketProtocol):
                         #   - Open redirect
                         #   - Header injection
                         #   - Script injection
+                        self.log.critical(
+                            "Rejecting suspicious request: Uri {uri} Headers {headers}",
+                            uri=self.http_request_uri, headers=self.http_headers)
                         return self.failHandshake("HTTP redirection not allowed")
                     else:
                         self.log.debug("HTTP Upgrade header missing : render server status page")
