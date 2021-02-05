@@ -173,6 +173,7 @@ setup(
     install_requires=[
         'six>=1.10.0',      # MIT license
         'txaio>=2.5.2',     # MIT license
+        'hyperlink>=20.0.1',    # MIT license (https://github.com/python-hyper/hyperlink)
     ],
     extras_require={
         'all': extras_require_all,
