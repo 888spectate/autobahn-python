@@ -2580,14 +2580,14 @@ class WebSocketServerProtocol(WebSocketProtocol):
                         #     )
                         #     self.sendRedirect(url)
 
-                        # AR-1389 Dropping redirect functionality to prevent
+                        # AR-1389 Dropping redirect functionality to prevent vulnerabilities:
                         #   - Open redirect
                         #   - Header injection
                         #   - Script injection
-                        self.log.critical(
-                            "Rejecting suspicious request: Uri {uri} Headers {headers}",
-                            uri=self.http_request_uri, headers=self.http_headers)
-                        return self.failHandshake("HTTP redirection not allowed")
+                        raise Exception(
+                            "Rejecting suspicious request: Uri {uri} Headers {headers}".format(
+                                uri=self.http_request_uri, headers=self.http_headers
+                            ))
                     else:
                         self.log.debug("HTTP Upgrade header missing : render server status page")
                         self.sendServerStatus()
