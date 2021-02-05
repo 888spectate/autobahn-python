@@ -57,7 +57,6 @@ from autobahn.websocket.util import parse_url
 
 from six.moves import urllib
 import txaio
-import hyperlink
 
 if six.PY3:
     # Python 3
@@ -2564,23 +2563,28 @@ class WebSocketServerProtocol(WebSocketProtocol):
                         #
                         # https://localhost:9000/?redirect=https%3A%2F%2Ftwitter.com%2F&after=3
                         #
-                        url = hyperlink.URL.from_text(self.http_request_params['redirect'][0])
-                        url = url.to_uri().normalize().to_text()
-                        if 'after' in self.http_request_params and len(self.http_request_params['after']) > 0:
-                            after = int(self.http_request_params['after'][0])
-                            self.log.debug(
-                                "HTTP Upgrade header missing : render server status page and "
-                                "meta-refresh-redirecting to {url} after {duration} seconds",
-                                url=url,
-                                duration=after,
-                            )
-                            self.sendServerStatus(url, after)
-                        else:
-                            self.log.debug(
-                                "HTTP Upgrade header missing : 303-redirecting to {url}",
-                                url=url,
-                            )
-                            self.sendRedirect(url)
+                        # url = self.http_request_params['redirect'][0]
+                        # if 'after' in self.http_request_params and len(self.http_request_params['after']) > 0:
+                        #     after = int(self.http_request_params['after'][0])
+                        #     self.log.debug(
+                        #         "HTTP Upgrade header missing : render server status page and "
+                        #         "meta-refresh-redirecting to {url} after {duration} seconds",
+                        #         url=url,
+                        #         duration=after,
+                        #     )
+                        #     self.sendServerStatus(url, after)
+                        # else:
+                        #     self.log.debug(
+                        #         "HTTP Upgrade header missing : 303-redirecting to {url}",
+                        #         url=url,
+                        #     )
+                        #     self.sendRedirect(url)
+
+                        # AR-1389 Dropping redirect functionality to prevent
+                        #   - Open redirect
+                        #   - Header injection
+                        #   - Script injection
+                        return self.failHandshake("HTTP redirection not allowed")
                     else:
                         self.log.debug("HTTP Upgrade header missing : render server status page")
                         self.sendServerStatus()
