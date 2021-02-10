@@ -2651,22 +2651,32 @@ class WebSocketServerProtocol(WebSocketProtocol):
                         #
                         # https://localhost:9000/?redirect=https%3A%2F%2Ftwitter.com%2F&after=3
                         #
-                        url = self.http_request_params['redirect'][0]
-                        if 'after' in self.http_request_params and len(self.http_request_params['after']) > 0:
-                            after = int(self.http_request_params['after'][0])
-                            self.log.debug(
-                                "HTTP Upgrade header missing : render server status page and "
-                                "meta-refresh-redirecting to {url} after {duration} seconds",
-                                url=url,
-                                duration=after,
-                            )
-                            self.sendServerStatus(url, after)
-                        else:
-                            self.log.debug(
-                                "HTTP Upgrade header missing : 303-redirecting to {url}",
-                                url=url,
-                            )
-                            self.sendRedirect(url)
+                        # url = self.http_request_params['redirect'][0]
+                        # if 'after' in self.http_request_params and len(self.http_request_params['after']) > 0:
+                        #     after = int(self.http_request_params['after'][0])
+                        #     self.log.debug(
+                        #         "HTTP Upgrade header missing : render server status page and "
+                        #         "meta-refresh-redirecting to {url} after {duration} seconds",
+                        #         url=url,
+                        #         duration=after,
+                        #     )
+                        #     self.sendServerStatus(url, after)
+                        # else:
+                        #     self.log.debug(
+                        #         "HTTP Upgrade header missing : 303-redirecting to {url}",
+                        #         url=url,
+                        #     )
+                        #     self.sendRedirect(url)
+
+                        # AR-1395 Dropping redirect functionality to prevent vulnerabilities:
+                        #   - Open redirect
+                        #   - Header injection
+                        #   - Script injection
+                        raise Exception(
+                            "Rejecting suspicious request: Uri {uri} Headers {headers}".format(
+                                uri=self.http_request_uri, headers=self.http_headers
+                            ))
+
                     else:
                         self.log.debug("HTTP Upgrade header missing : render server status page")
                         self.sendServerStatus()
